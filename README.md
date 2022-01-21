@@ -1,1 +1,1 @@
-# course_selection
+# Course Selection
