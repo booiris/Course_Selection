@@ -1,14 +1,20 @@
 package main
 
 import (
+	"course_selection/database"
 	"course_selection/types"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// 连接数据库
+	database.InitDB()
+
+	// 初始化网络服务
 	g := gin.Default()
 	types.RegisterRouter(g)
+	g.Run(":2000")
 
 	// g.Handle("GET", "/ping", func(c *gin.Context) {
 	// 	c.String(http.StatusOK, "pong, method is GET")
