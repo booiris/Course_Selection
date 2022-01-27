@@ -2,7 +2,7 @@ package main
 
 import (
 	"course_selection/database"
-	"course_selection/types"
+	"course_selection/router"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +13,7 @@ func main() {
 
 	// 初始化网络服务
 	g := gin.Default()
-	types.RegisterRouter(g)
+	router.RegisterRouter(g)
 	g.Run(":2000")
 
 	// g.Handle("GET", "/ping", func(c *gin.Context) {

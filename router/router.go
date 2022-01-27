@@ -1,4 +1,4 @@
-package types
+package router
 
 import (
 	"course_selection/auth"
