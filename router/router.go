@@ -1,7 +1,7 @@
 package router
 
 import (
-	"course_selection/auth"
+	"course_selection/control"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,9 +18,9 @@ func RegisterRouter(r *gin.Engine) {
 
 	// 登录
 
-	g.POST("/auth/login", auth.Login)
-	g.POST("/auth/logout", auth.Logout)
-	g.GET("/auth/whoami", auth.Whoami)
+	g.POST("/auth/login", control.Login)
+	g.POST("/auth/logout", control.Logout)
+	g.GET("/auth/whoami", control.Whoami)
 
 	// 排课
 	g.POST("/course/create")

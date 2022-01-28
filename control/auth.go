@@ -1,0 +1,50 @@
+package control
+
+import (
+	"course_selection/database"
+	"course_selection/types"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func Login(c *gin.Context) {
+	var data types.LoginRequest
+	if err := c.ShouldBind(&data); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, types.LoginResponse{Code: types.WrongPassword})
+		return
+	}
+	var res types.LoginResponse
+	database.Db.Table("TMember").Where(&data).Find(&res.Data)
+	if res == (types.LoginResponse{}) {
+		c.JSON(http.StatusOK, types.LoginResponse{Code: types.WrongPassword})
+	} else {
+		c.SetCookie("camp-session", res.Data.UserID, 3600, "/", "", false, true)
+		c.JSON(http.StatusOK, types.LoginResponse{Code: types.OK, Data: res.Data})
+	}
+}
+
+func Logout(c *gin.Context) {
+	value, err := c.Cookie("camp-session")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, types.LogoutResponse{Code: types.LoginRequired})
+		return
+	}
+	c.SetCookie("camp-session", value, -1, "/", "", false, true)
+	c.JSON(http.StatusOK, types.LogoutResponse{Code: types.OK})
+}
+
+func Whoami(c *gin.Context) {
+	value, err := c.Cookie("camp-session")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, types.WhoAmIResponse{Code: types.LoginRequired})
+		return
+	}
+	var res types.TMember
+	database.Db.Table("TMember").Where(&value).Find(&res)
+	c.JSON(http.StatusOK, types.WhoAmIResponse{Code: types.OK, Data: res})
+}
