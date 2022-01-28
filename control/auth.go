@@ -13,7 +13,6 @@ func Login(c *gin.Context) {
 	var data types.LoginRequest
 	if err := c.ShouldBind(&data); err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, types.LoginResponse{Code: types.WrongPassword})
 		return
 	}
 	var res types.LoginResponse
@@ -30,7 +29,6 @@ func Logout(c *gin.Context) {
 	value, err := c.Cookie("camp-session")
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, types.LogoutResponse{Code: types.LoginRequired})
 		return
 	}
 	c.SetCookie("camp-session", value, -1, "/", "", false, true)
@@ -41,7 +39,6 @@ func Whoami(c *gin.Context) {
 	value, err := c.Cookie("camp-session")
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, types.WhoAmIResponse{Code: types.LoginRequired})
 		return
 	}
 	var res types.TMember

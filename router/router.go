@@ -10,11 +10,11 @@ func RegisterRouter(r *gin.Engine) {
 	g := r.Group("/api/v1")
 
 	// 成员管理
-	g.POST("/member/create")
-	g.GET("/member")
-	g.GET("/member/list")
-	g.POST("/member/update")
-	g.POST("/member/delete")
+	g.POST("/member/create", control.Member_create)
+	g.GET("/member", control.Member_get)
+	g.GET("/member/list", control.Member_get_list)
+	g.POST("/member/update", control.Member_update)
+	g.POST("/member/delete", control.Member_delete)
 
 	// 登录
 
