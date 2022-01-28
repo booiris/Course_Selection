@@ -1,10 +1,10 @@
 package auth
 
 import (
+	"Course_Selection/dataBase"
+	"Course_Selection/rule"
 	"encoding/json"
 	"fmt"
-	"helloWorld/dataBase"
-	"helloWorld/rule"
 	"io/ioutil"
 	"net/http"
 
@@ -45,7 +45,15 @@ func Login(c *gin.Context) {
 		c.String(http.StatusOK, fmt.Sprintf("Login Success. The id is %s", id))
 	}
 
-	c.SetCookie("user_cookie", id, 1000, "/", "localhost", false, true)
+	c.SetCookie(
+		"user_cookie",
+		"2",
+		1000,
+		"/",
+		"localhost",
+		false,
+		true,
+	)
 	/*
 	 * 断开连接
 	 */

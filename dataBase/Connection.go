@@ -1,9 +1,9 @@
 package dataBase
 
 import (
+	"Course_Selection/rule"
 	"database/sql"
 	"fmt"
-	"helloWorld/rule"
 )
 
 func CreateConnection() (*sql.DB, error) {

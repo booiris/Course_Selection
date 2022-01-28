@@ -1,9 +1,9 @@
 package main
 
 import (
+	"Course_Selection/auth"
+	"Course_Selection/dataBase"
 	"fmt"
-	"helloWorld/auth"
-	"helloWorld/dataBase"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

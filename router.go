@@ -1,7 +1,7 @@
 package main
 
 import (
-	"helloWorld/auth"
+	"Course_Selection/auth"
 
 	"github.com/gin-gonic/gin"
 )
