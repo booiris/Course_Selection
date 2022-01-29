@@ -1,7 +1,7 @@
 package router
 
 import (
-	"course_selection/control"
+	"course_selection/controller"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,17 +10,17 @@ func RegisterRouter(r *gin.Engine) {
 	g := r.Group("/api/v1")
 
 	// 成员管理
-	g.POST("/member/create", control.Member_create)
-	g.GET("/member", control.Member_get)
-	g.GET("/member/list", control.Member_get_list)
-	g.POST("/member/update", control.Member_update)
-	g.POST("/member/delete", control.Member_delete)
+	g.POST("/member/create", controller.Member_create)
+	g.GET("/member", controller.Member_get)
+	g.GET("/member/list", controller.Member_get_list)
+	g.POST("/member/update", controller.Member_update)
+	g.POST("/member/delete", controller.Member_delete)
 
 	// 登录
 
-	g.POST("/auth/login", control.Login)
-	g.POST("/auth/logout", control.Logout)
-	g.GET("/auth/whoami", control.Whoami)
+	g.POST("/auth/login", controller.Login)
+	g.POST("/auth/logout", controller.Logout)
+	g.GET("/auth/whoami", controller.Whoami)
 
 	// 排课
 	g.POST("/course/create")
