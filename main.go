@@ -1,12 +1,20 @@
 package main
 
 import (
-	"course_selection/types"
+	"course_selection/database"
+	"course_selection/router"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+
+	// 连接数据库
+	database.InitDB()
+
+	// 初始化网络服务
 	g := gin.Default()
-	types.RegisterRouter(g)
+	router.RegisterRouter(g)
+	g.Run(":80")
+
 }
