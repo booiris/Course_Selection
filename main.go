@@ -8,8 +8,11 @@ import (
 )
 
 func main() {
+
 	// 连接数据库
 	database.InitDB()
+
+	// database.Db.AutoMigrate(&types.Member{})
 
 	// 初始化网络服务
 	g := gin.Default()

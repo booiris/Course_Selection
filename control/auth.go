@@ -16,7 +16,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	var res types.LoginResponse
-	database.Db.Table("TMember").Where(&data).Find(&res.Data)
+	database.Db.Table("members").Where(&data).Find(&res.Data)
 	if res == (types.LoginResponse{}) {
 		c.JSON(http.StatusOK, types.LoginResponse{Code: types.WrongPassword})
 	} else {
@@ -42,6 +42,6 @@ func Whoami(c *gin.Context) {
 		return
 	}
 	var res types.TMember
-	database.Db.Table("TMember").Where(&value).Find(&res)
+	database.Db.Table("members").Where(&value).Find(&res)
 	c.JSON(http.StatusOK, types.WhoAmIResponse{Code: types.OK, Data: res})
 }

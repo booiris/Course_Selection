@@ -15,8 +15,8 @@ func check_permission(c *gin.Context) bool {
 		log.Println(err)
 		return false
 	}
-	var res types.TMember
-	database.Db.Table("TMember").Where(&value).Find(&res.UserType)
+	var res struct{ UserType types.UserType }
+	database.Db.Table("members").Where(&value).Find(&res)
 	return res.UserType == types.Admin
 }
 
@@ -68,7 +68,7 @@ func Member_update(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	database.Db.Table("TMember").Where(&data.UserID).Update("Nickname", data.Nickname)
+	database.Db.Table("members").Where(&data.UserID).Update("Nickname", data.Nickname)
 	c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.OK})
 }
 
@@ -82,7 +82,7 @@ func Member_delete(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	// TODO 软删除
-	database.Db.Table("TMember").Where(&data)
+	database.Db.Table("members").Where(&data).Delete(&types.Member{})
+	c.SetCookie("camp-session", data.UserID, -1, "/", "", false, true)
 	c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.OK})
 }

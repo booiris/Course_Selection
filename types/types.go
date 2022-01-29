@@ -32,6 +32,26 @@ type ResponseMeta struct {
 	Code ErrNo
 }
 
+type Member struct {
+	UserID   string   `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
+	Nickname string   `gorm:"type:varchar(32) not null"`
+	Username string   `gorm:"type:varchar(32) not null"`
+	UserType UserType `gorm:"type:int not null"`
+	Password string   `gorm:"type:varchar(32) not null"`
+}
+
+type Course struct {
+	CourseID  string `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
+	Name      string `gorm:"type:varchar(32) not null"`
+	Cap       int    `gorm:"type:int not null"`
+	TeacherID string `gorm:"type:varchar(32)"`
+}
+
+type SCourse struct {
+	CourseID string `gorm:"type:bigint UNSIGNED not null"`
+	UserID   string `gorm:"type:bigint UNSIGNED not null"`
+}
+
 type TMember struct {
 	UserID   string
 	Nickname string
