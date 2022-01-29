@@ -1,5 +1,7 @@
 package types
 
+import "gorm.io/gorm"
+
 // 说明：
 // 1. 所提到的「位数」均以字节长度为准
 // 2. 所有的 ID 均为 int64（以 string 方式表现）
@@ -35,21 +37,22 @@ type ResponseMeta struct {
 type Member struct {
 	UserID   string   `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
 	Nickname string   `gorm:"type:varchar(32) not null"`
-	Username string   `gorm:"type:varchar(32) not null"`
+	Username string   `gorm:"type:varchar(32) not null;unique;index"`
 	UserType UserType `gorm:"type:int not null"`
 	Password string   `gorm:"type:varchar(32) not null"`
+	Deleted  gorm.DeletedAt
 }
 
 type Course struct {
 	CourseID  string `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
 	Name      string `gorm:"type:varchar(32) not null"`
 	Cap       int    `gorm:"type:int not null"`
-	TeacherID string `gorm:"type:varchar(32)"`
+	TeacherID string `gorm:"type:varchar(32);index"`
 }
 
 type SCourse struct {
 	CourseID string `gorm:"type:bigint UNSIGNED not null"`
-	UserID   string `gorm:"type:bigint UNSIGNED not null"`
+	UserID   string `gorm:"type:bigint UNSIGNED not null;index"`
 }
 
 type TMember struct {

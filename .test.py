@@ -19,4 +19,4 @@ print(r.text)
 #   Password VARCHAR(32) NOT NULL
 # ) DEFAULT CHARSET UTF8;
 
-# insert into TMember (Nickname,Username,UserType,Password) values ("root","JudgeAdmin",1,"JudgePassword2022")
+# insert into members (Nickname,Username,User_Type,Password) values ("root","JudgeAdmin",1,"JudgePassword2022")
