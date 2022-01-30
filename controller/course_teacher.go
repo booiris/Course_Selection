@@ -35,17 +35,17 @@ func Course_schedule(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	res := match_course(data.TeacherCourseRelationShip)
+	res := match_course(&data.TeacherCourseRelationShip)
 	c.JSON(http.StatusOK, types.ScheduleCourseResponse{Code: types.OK, Data: res})
 }
 
-func match_course(data map[string][]string) map[string]string {
+func match_course(data *map[string][]string) map[string]string {
 	t2c := make(map[string]string)
 	c2t := make(map[string]string)
-	for k := range data {
+	for k := range *data {
 		if _, is_exist := t2c[k]; !is_exist {
 			check := make(map[string]struct{})
-			dfs(k, &data, &check, &t2c, &c2t)
+			dfs(k, data, &check, &t2c, &c2t)
 		}
 	}
 	return t2c
