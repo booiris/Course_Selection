@@ -16,5 +16,4 @@ func main() {
 	g := gin.Default()
 	router.RegisterRouter(g)
 	g.Run(":80")
-
 }
