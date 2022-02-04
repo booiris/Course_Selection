@@ -32,7 +32,7 @@ func RegisterRouter(r *gin.Engine) {
 	g.POST("/course/schedule", controller.Course_schedule)
 
 	// 抢课
-	g.POST("/student/book_course")
-	g.GET("/student/course")
+	g.POST("/student/book_course", controller.Student_book_course)
+	g.GET("/student/course", controller.Student_course)
 
 }
