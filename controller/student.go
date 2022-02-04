@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"course_selection/database"
 	"course_selection/types"
 	"log"
@@ -12,6 +13,9 @@ import (
 // 选课
 func Student_book_course(c *gin.Context) {
 
+	context := context.Background()
+
+	database.Rdb.Incr(context, "123")
 }
 
 // 获取学生选课列表
