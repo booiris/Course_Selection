@@ -35,12 +35,12 @@ type ResponseMeta struct {
 }
 
 type Member struct {
-	UserID   string   `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
-	Nickname string   `gorm:"type:varchar(32) not null"`
-	Username string   `gorm:"type:varchar(32) not null;unique;index"`
-	UserType UserType `gorm:"type:int not null"`
-	Password string   `gorm:"type:varchar(32) not null"`
-	Deleted  gorm.DeletedAt
+	UserID   string         `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
+	Nickname string         `gorm:"type:varchar(32) not null"`
+	Username string         `gorm:"type:varchar(32) not null;uniqueIndex:udx_name"`
+	UserType UserType       `gorm:"type:int not null"`
+	Password string         `gorm:"type:varchar(32) not null"`
+	Deleted  gorm.DeletedAt `gorm:"uniqueIndex:udx_name;"`
 }
 
 type Course struct {
