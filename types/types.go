@@ -1,5 +1,7 @@
 package types
 
+import "gorm.io/gorm"
+
 // 说明：
 // 1. 所提到的「位数」均以字节长度为准
 // 2. 所有的 ID 均为 int64（以 string 方式表现）
@@ -33,6 +35,7 @@ type ResponseMeta struct {
 }
 
 type Member struct {
+	Deleted  gorm.DeletedAt
 	UserID   string   `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
 	Nickname string   `gorm:"type:varchar(32) not null"`
 	Username string   `gorm:"type:varchar(32) not null"`
@@ -86,10 +89,10 @@ const (
 // 只有管理员才能添加
 
 type CreateMemberRequest struct {
-	Nickname string   `form:"Nickname" json:"Nickname" xml:"Nickname"  binding:"required"` // required，不小于 4 位 不超过 20 位
-	Username string   `form:"Username" json:"Username" xml:"Username"  binding:"required"` // required，只支持大小写，长度不小于 8 位 不超过 20 位
-	Password string   `form:"Password" json:"Password" xml:"Password"  binding:"required"` // required，同时包括大小写、数字，长度不少于 8 位 不超过 20 位
-	UserType UserType `form:"UserType" json:"UserType" xml:"UserType"  binding:"required"` // required, 枚举值
+	Nickname string   `form:"Nickname" json:"Nickname" xml:"Nickname"  binding:"required,min=4,max=20"`          // required，不小于 4 位 不超过 20 位
+	Username string   `form:"Username" json:"Username" xml:"Username"  binding:"required,alpha,min=8,max=20"`    // required，只支持大小写，长度不小于 8 位 不超过 20 位
+	Password string   `form:"Password" json:"Password" xml:"Password"  binding:"required,alphanum,min=8,max=20"` // required，同时包括大小写、数字，长度不少于 8 位 不超过 20 位
+	UserType UserType `form:"UserType" json:"UserType" xml:"UserType"  binding:"required,min=1,max=3"`           // required, 枚举值
 }
 
 type CreateMemberResponse struct {
@@ -194,8 +197,8 @@ type WhoAmIResponse struct {
 // 创建课程
 // Method: Post
 type CreateCourseRequest struct {
-	Name string
-	Cap  int
+	Name string `form:"Name" json:"Name" xml:"Name"  binding:"required"`
+	Cap  int    `form:"Cap" json:"Cap" xml:"Cap"  binding:"required"`
 }
 
 type CreateCourseResponse struct {
@@ -208,7 +211,7 @@ type CreateCourseResponse struct {
 // 获取课程
 // Method: Get
 type GetCourseRequest struct {
-	CourseID string
+	CourseID string `form:"CourseID" json:"CourseID" xml:"CourseID"  binding:"required"`
 }
 
 type GetCourseResponse struct {
@@ -221,8 +224,8 @@ type GetCourseResponse struct {
 // 注：这里的 teacherID 不需要做已落库校验
 // 一个老师可以绑定多个课程 , 不过，一个课程只能绑定在一个老师下面
 type BindCourseRequest struct {
-	CourseID  string
-	TeacherID string
+	CourseID  string `form:"CourseID" json:"CourseID" xml:"CourseID"  binding:"required"`
+	TeacherID string `form:"TeacherID" json:"TeacherID" xml:"TeacherID"  binding:"required"`
 }
 
 type BindCourseResponse struct {
@@ -232,8 +235,8 @@ type BindCourseResponse struct {
 // 老师解绑课程
 // Method： Post
 type UnbindCourseRequest struct {
-	CourseID  string
-	TeacherID string
+	CourseID  string `form:"CourseID" json:"CourseID" xml:"CourseID"  binding:"required"`
+	TeacherID string `form:"TeacherID" json:"TeacherID" xml:"TeacherID"  binding:"required"`
 }
 
 type UnbindCourseResponse struct {
@@ -243,7 +246,7 @@ type UnbindCourseResponse struct {
 // 获取老师下所有课程
 // Method：Get
 type GetTeacherCourseRequest struct {
-	TeacherID string
+	TeacherID string `form:"TeacherID" json:"TeacherID" xml:"TeacherID"  binding:"required"`
 }
 
 type GetTeacherCourseResponse struct {
@@ -256,7 +259,7 @@ type GetTeacherCourseResponse struct {
 // 排课求解器，使老师绑定课程的最优解， 老师有且只能绑定一个课程
 // Method： Post
 type ScheduleCourseRequest struct {
-	TeacherCourseRelationShip map[string][]string // key 为 teacherID , val 为老师期望绑定的课程 courseID 数组
+	TeacherCourseRelationShip map[string][]string `form:"TeacherCourseRelationShip" json:"TeacherCourseRelationShip" xml:"TeacherCourseRelationShip"  binding:"required"` // key 为 teacherID , val 为老师期望绑定的课程 courseID 数组
 }
 
 type ScheduleCourseResponse struct {
@@ -265,8 +268,8 @@ type ScheduleCourseResponse struct {
 }
 
 type BookCourseRequest struct {
-	StudentID string
-	CourseID  string
+	StudentID string `form:"StudentID" json:"StudentID" xml:"StudentID"  binding:"required"`
+	CourseID  string `form:"CourseID" json:"CourseID" xml:"CourseID"  binding:"required"`
 }
 
 // 课程已满返回 CourseNotAvailable
@@ -276,7 +279,7 @@ type BookCourseResponse struct {
 }
 
 type GetStudentCourseRequest struct {
-	StudentID string
+	StudentID string `form:"StudentID" json:"StudentID" xml:"StudentID"  binding:"required"`
 }
 
 type GetStudentCourseResponse struct {

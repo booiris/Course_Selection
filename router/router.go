@@ -2,13 +2,14 @@ package router
 
 import (
 	"course_selection/controller"
+	"course_selection/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRouter(r *gin.Engine) {
 	g := r.Group("/api/v1")
-
+	g.Use(middleware.CORSMiddleware())
 	// 成员管理
 	g.POST("/member/create", controller.Member_create)
 	g.GET("/member", controller.Member_get)

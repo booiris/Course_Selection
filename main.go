@@ -3,7 +3,6 @@ package main
 import (
 	"course_selection/database"
 	"course_selection/router"
-
 	"github.com/gin-gonic/gin"
 )
 
