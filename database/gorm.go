@@ -11,10 +11,11 @@ import (
 //数据库配置
 const (
 	userName = "root"
-	password = "bytedancecamp"
-	ip       = "127.0.0.1"
-	port     = "3306"
-	dbName   = "main"
+	password = "12345678"
+	// password = "bytedancecamp"
+	ip     = "127.0.0.1"
+	port   = "3306"
+	dbName = "main"
 )
 
 var Db *gorm.DB
