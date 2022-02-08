@@ -3,7 +3,6 @@ package controller
 import (
 	"course_selection/database"
 	"course_selection/types"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -16,15 +15,14 @@ func Login(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	var res struct{ UserID string }
-	database.Db.Debug().Model(&types.Member{}).Where(&data).Find(&res)
-	fmt.Println(res, data)
-	// if res == (types.LoginResponse{}) {
-	// 	c.JSON(http.StatusOK, types.LoginResponse{Code: types.WrongPassword})
-	// } else {
-	// 	c.SetCookie("camp-session", res.Data.UserID, 3600, "/", "", false, true)
-	// 	c.JSON(http.StatusOK, types.LoginResponse{Code: types.OK, Data: res.Data})
-	// }
+	var res types.LoginResponse
+	database.Db.Model(&types.Member{}).Where(&data).Find(&res.Data)
+	if res == (types.LoginResponse{}) {
+		c.JSON(http.StatusOK, types.LoginResponse{Code: types.WrongPassword})
+	} else {
+		c.SetCookie("camp-session", res.Data.UserID, 3600, "/", "", false, true)
+		c.JSON(http.StatusOK, types.LoginResponse{Code: types.OK, Data: res.Data})
+	}
 }
 
 func Logout(c *gin.Context) {

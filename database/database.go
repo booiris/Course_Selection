@@ -50,9 +50,9 @@ func InitDB() {
 func InitRedis() {
 	Rdb = redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
-		Password: "",  // no password set
-		DB:       1,   // use default DB
-		PoolSize: 100, // 连接池大小
+		Password: "zjredis", // no password set
+		DB:       1,         // use default DB
+		PoolSize: 100,       // 连接池大小
 	})
 
 	ctx, cancel := context.WithCancel(context.Background())
