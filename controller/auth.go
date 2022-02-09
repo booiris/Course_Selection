@@ -44,7 +44,7 @@ func Whoami(c *gin.Context) {
 	}
 	var member types.Member
 	database.Db.Where("user_id = ?", userid).Find(&member)
-	data := types.TMember{}
+	var data types.TMember
 	data.UserID = member.UserID
 	data.Nickname = member.Nickname
 	data.Username = member.Username
