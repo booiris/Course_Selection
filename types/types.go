@@ -35,7 +35,7 @@ type ResponseMeta struct {
 }
 
 type Member struct {
-	UserID   string         `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
+	UserID   string         `gorm:"primaryKey;type:bigint UNSIGNED AUTO_INCREMENT"`
 	Nickname string         `gorm:"type:varchar(32) not null"`
 	Username string         `gorm:"type:varchar(32) not null;uniqueIndex:udx_name"`
 	UserType UserType       `gorm:"type:int not null"`
