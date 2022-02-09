@@ -54,7 +54,7 @@ func Teacher_unbind_course(c *gin.Context) {
 		return
 	}
 	//TODO 未绑定判断
-	database.Db.Table("courses").Where(&data).Update("teacher_id", "")
+	database.Db.Table("courses").Where(&data).Update("teacher_id", nil)
 	c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.OK})
 }
 

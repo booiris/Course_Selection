@@ -132,17 +132,23 @@ func Member_update(c *gin.Context) {
 }
 
 func Member_delete(c *gin.Context) {
-	if !check_permission(c) {
-		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.PermDenied})
-		return
-	}
 	var data types.DeleteMemberRequest
 	if err := c.ShouldBind(&data); err != nil {
 		log.Println(err)
 		return
 	}
-	//TODO 数据一致性
-	database.Db.Table("members").Where(&data).Delete(&types.Member{})
+	var user types.Member
+	database.Db.Model(&types.Member{}).Where(&data).Find(&user)
+	if user == (types.Member{}) {
+		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserNotExisted})
+		return
+	}
+	if user.UserType == types.Teacher {
+		database.Db.Table("courses").Where("teacher_id=?", user.UserID).Update("teacher_id", nil)
+	} else if user.UserType == types.Student {
+		database.Db.Where("user_id=?", user.UserID).Delete(types.SCourse{})
+	}
+	database.Db.Debug().Where("user_id=?", data.UserID).Delete(&types.Member{})
 	c.SetCookie("camp-session", data.UserID, -1, "/", "", false, true)
 	c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.OK})
 }
