@@ -148,7 +148,7 @@ func Member_delete(c *gin.Context) {
 	} else if user.UserType == types.Student {
 		database.Db.Where("user_id=?", user.UserID).Delete(types.SCourse{})
 	}
-	database.Db.Debug().Where("user_id=?", data.UserID).Delete(&types.Member{})
+	database.Db.Where("user_id=?", data.UserID).Delete(&types.Member{})
 	c.SetCookie("camp-session", data.UserID, -1, "/", "", false, true)
 	c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.OK})
 }
