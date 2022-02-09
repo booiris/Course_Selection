@@ -21,7 +21,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	c.JSON(200, types.LoginResponse{Code: types.OK, Data: struct{ UserID string }{UserID: member.UserID}})
-	c.SetCookie("camp-session", member.UserID, 360000, "/", "localhost", false, false)
+	c.SetCookie("camp-session", member.UserID, 360000, "/", "", false, false)
 }
 
 // 登出
@@ -31,7 +31,7 @@ func Logout(c *gin.Context) {
 		c.JSON(200, types.LogoutResponse{Code: types.LoginRequired})
 		return
 	}
-	c.SetCookie("camp-session", userid, -1, "/", "localhost", false, false)
+	c.SetCookie("camp-session", userid, -1, "/", "", false, false)
 	c.JSON(200, types.LogoutResponse{Code: types.OK})
 }
 
