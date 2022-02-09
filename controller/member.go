@@ -81,10 +81,10 @@ func Member_create(c *gin.Context) {
 	}
 	if check_param(data) {
 		var res struct{ UserId string }
-		database.Db.Table("members").Where(map[string]interface{}{"Username": data.Username}).Find(&res)
+		database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
 		if res == (struct{ UserId string }{}) {
-			database.Db.Table("members").Create(&data)
-			database.Db.Table("members").Where(map[string]interface{}{"Username": data.Username}).Find(&res)
+			database.Db.Model(types.Member{}).Create(&data)
+			database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.OK, Data: struct{ UserID string }{res.UserId}})
 		} else {
 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.UserHasExisted})
@@ -118,17 +118,17 @@ func Member_get_list(c *gin.Context) {
 }
 
 func Member_update(c *gin.Context) {
-	if !check_permission(c) {
-		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.PermDenied})
-		return
-	}
 	var data types.UpdateMemberRequest
 	if err := c.ShouldBind(&data); err != nil {
 		log.Println(err)
 		return
 	}
-	database.Db.Table("members").Where("user_id=?", data.UserID).Update("Nickname", data.Nickname)
-	c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.OK})
+	res := database.Db.Model(types.Member{}).Where("user_id=?", data.UserID).Update("Nickname", data.Nickname)
+	if res.RowsAffected == 0 {
+		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.UserNotExisted})
+	} else {
+		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.OK})
+	}
 }
 
 func Member_delete(c *gin.Context) {
