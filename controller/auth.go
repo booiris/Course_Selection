@@ -20,8 +20,8 @@ func Login(c *gin.Context) {
 		c.JSON(200, types.LoginResponse{Code: types.WrongPassword})
 		return
 	}
+	c.SetCookie("camp-session", member.UserID, 3600, "/", "", false, true)
 	c.JSON(200, types.LoginResponse{Code: types.OK, Data: struct{ UserID string }{UserID: member.UserID}})
-	c.SetCookie("camp-session", member.UserID, 360000, "/", "", false, false)
 }
 
 // 登出
