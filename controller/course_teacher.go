@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"course_selection/database"
 	"course_selection/types"
 	"log"
 	"net/http"
-	"github.com/gin-gonic/gin"
-	"course_selection/database"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,8 +21,8 @@ func Course_create(c *gin.Context) {
 	var u types.Course
 	database.Db.Where("Name=?", createCourseRequest.Name).First(&u)
 	c.JSON(http.StatusOK, types.CreateCourseResponse{
-		types.OK,
-		struct{ CourseID string }{CourseID: u.CourseID},
+		Code: types.OK,
+		Data: struct{ CourseID string }{CourseID: u.CourseID},
 	})
 }
 
@@ -91,8 +91,8 @@ func Teacher_get_course(c *gin.Context) {
 	var courses []*types.TCourse
 	database.Db.Table("Courses").Where("TeacherID", getTeacherCourseRequest.TeacherID).Find(&courses)
 	c.JSON(http.StatusOK, types.GetTeacherCourseResponse{
-		types.OK,
-		struct{ CourseList []*types.TCourse }{CourseList: courses},
+		Code: types.OK,
+		Data: struct{ CourseList []*types.TCourse }{CourseList: courses},
 	})
 }
 
