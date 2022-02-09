@@ -4,6 +4,7 @@ import (
 	"course_selection/database"
 	"course_selection/types"
 	"log"
+	"net/http"
 	"strings"
 	"unicode"
 
@@ -86,4 +87,23 @@ func Member_update(c *gin.Context) {
 
 // 删除成员
 func Member_delete(c *gin.Context) {
+	var data types.DeleteMemberRequest
+	if err := c.ShouldBind(&data); err != nil {
+		log.Println(err)
+		return
+	}
+	var user types.Member
+	database.Db.Model(&types.Member{}).Where(&data).Find(&user)
+	if user == (types.Member{}) {
+		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserNotExisted})
+		return
+	}
+	if user.UserType == types.Teacher {
+		database.Db.Table("courses").Where("teacher_id=?", user.UserID).Update("teacher_id", nil)
+	} else if user.UserType == types.Student {
+		database.Db.Where("user_id=?", user.UserID).Delete(types.SCourse{})
+	}
+	database.Db.Where("user_id=?", data.UserID).Delete(&types.Member{})
+	c.SetCookie("camp-session", data.UserID, -1, "/", "", false, true)
+	c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.OK})
 }

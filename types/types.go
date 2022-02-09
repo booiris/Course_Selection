@@ -51,6 +51,7 @@ type Course struct {
 }
 
 type SCourse struct {
+	SCID     string `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
 	CourseID string `gorm:"type:bigint UNSIGNED not null"`
 	UserID   string `gorm:"type:bigint UNSIGNED not null;index"`
 }
