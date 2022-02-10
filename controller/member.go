@@ -97,21 +97,39 @@ func Member_create(c *gin.Context) {
 
 // 获取单个成员信息
 func Member_get(c *gin.Context) {
+	var data types.GetMemberRequest
+	if err := c.ShouldBind(&data); err != nil {
+		log.Println(err)
+		return
+	}
+	var res types.Member
+	database.Db.Model(types.Member{}).Unscoped().Where(&data).Find(&res)
+	if res == (types.Member{}) {
+		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserNotExisted})
+	} else {
+		if res.Deleted.Valid {
+			c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserHasDeleted})
+		} else {
+			send_data := types.TMember{
+				UserID:   res.UserID,
+				Username: res.Username,
+				UserType: res.UserType,
+				Nickname: res.Nickname,
+			}
+			c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.OK, Data: send_data})
+		}
+	}
 }
 
 // 获取成员列表
 func Member_get_list(c *gin.Context) {
-	if check_permission(c) {
-		c.JSON(http.StatusOK, types.GetMemberListResponse{Code: types.PermDenied})
-		return
-	}
 	var data types.GetMemberListRequest
 	if err := c.ShouldBind(&data); err != nil {
 		log.Println(err)
 		return
 	}
 	var users []types.TMember
-	if err := database.Db.Table("members").Limit(data.Limit).Offset(data.Offset).Find(&users).Error; err != nil {
+	if err := database.Db.Model(types.Member{}).Limit(data.Limit).Offset(data.Offset).Find(&users).Error; err != nil {
 		c.JSON(http.StatusOK, types.GetMemberListResponse{Code: types.UnknownError})
 	}
 	c.JSON(http.StatusOK, types.GetMemberListResponse{Code: types.OK, Data: struct{ MemberList []types.TMember }{MemberList: users}})

@@ -21,7 +21,7 @@ var Db *gorm.DB
 
 func InitDB() {
 	//构建连接："用户名:密码@tcp(IP:端口)/数据库?charset=utf8mb4"
-	dsn := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8mb4"}, "")
+	dsn := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8mb4&parseTime=True"}, "")
 	var err error
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
