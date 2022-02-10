@@ -119,8 +119,8 @@ type GetMemberResponse struct {
 // 批量获取成员信息
 
 type GetMemberListRequest struct {
-	Offset int `form:"Offset" json:"Offset" xml:"Offset"  binding:"required"`
-	Limit  int `form:"Limit" json:"Limit" xml:"Limit"  binding:"required"`
+	Offset int
+	Limit  int
 }
 
 type GetMemberListResponse struct {
