@@ -1,5 +1,7 @@
 package types
 
+import "gorm.io/gorm"
+
 // 说明：
 // 1. 所提到的「位数」均以字节长度为准
 // 2. 所有的 ID 均为 int64（以 string 方式表现）
@@ -33,23 +35,26 @@ type ResponseMeta struct {
 }
 
 type Member struct {
-	UserID   string   `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
-	Nickname string   `gorm:"type:varchar(32) not null"`
-	Username string   `gorm:"type:varchar(32) not null"`
-	UserType UserType `gorm:"type:int not null"`
-	Password string   `gorm:"type:varchar(32) not null"`
+	UserID   string         `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
+	Nickname string         `gorm:"type:varchar(32) not null"`
+	Username string         `gorm:"type:varchar(32) not null;uniqueIndex:udx_name"`
+	UserType UserType       `gorm:"type:int not null"`
+	Password string         `gorm:"type:varchar(32) not null"`
+	Deleted  gorm.DeletedAt `gorm:"uniqueIndex:udx_name;"`
 }
 
 type Course struct {
 	CourseID  string `gorm:"primaryKey;type:bigint UNSIGNED not null AUTO_INCREMENT"`
 	Name      string `gorm:"type:varchar(32) not null"`
 	Cap       int    `gorm:"type:int not null"`
-	TeacherID string `gorm:"type:varchar(32)"`
+	TeacherID string `gorm:"type:varchar(32);index"`
 }
+
+var Course_Cap map[string]int
 
 type SCourse struct {
 	CourseID string `gorm:"type:bigint UNSIGNED not null"`
-	UserID   string `gorm:"type:bigint UNSIGNED not null"`
+	UserID   string `gorm:"type:bigint UNSIGNED not null;index"`
 }
 
 type TMember struct {
@@ -84,6 +89,12 @@ const (
 // 参数不合法返回 ParamInvalid
 
 // 只有管理员才能添加
+
+type GetCount interface {
+	get(n int) int
+}
+
+var Count int
 
 type CreateMemberRequest struct {
 	Nickname string   `form:"Nickname" json:"Nickname" xml:"Nickname"  binding:"required"` // required，不小于 4 位 不超过 20 位

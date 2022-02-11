@@ -9,28 +9,82 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 登录
+// type LoginRequest struct {
+// 	Username string `form:"Username" json:"Username" xml:"Username"  binding:"required"`
+// 	Password string `form:"Password" json:"Password" xml:"Password"  binding:"required"`
+// }
+
+// // 登录成功后需要 Set-Cookie("camp-session", ${value})
+// // 密码错误范围密码错误状态码
+
+// type LoginResponse struct {
+// 	Code ErrNo
+// 	Data struct {
+// 		UserID string
+// 	}
+// }
+
 func Login(c *gin.Context) {
-	var data types.LoginRequest
-	if err := c.ShouldBind(&data); err != nil {
+	/* 解析json */
+	var request types.LoginRequest
+	if err := c.ShouldBind(&request); err != nil {
 		log.Println(err)
 		return
 	}
-	var res types.LoginResponse
-	database.Db.Table("members").Where(&data).Find(&res.Data)
-	if res == (types.LoginResponse{}) {
-		c.JSON(http.StatusOK, types.LoginResponse{Code: types.WrongPassword})
+
+	/* 提取数据 */
+	member := types.Member{}
+	database.Db.Debug().Model(&types.Member{}).Where("username = ?", request.Username).Find(&member)
+	// fmt.Println("userId : ", member)
+	// fmt.Println("request : ", request)
+
+	/* 构建Response */
+	var response types.LoginResponse
+	/* 判断返回ErrNo */
+	// UserHasDeleted     ErrNo = 3  // 用户已删除
+	// UserNotExisted     ErrNo = 4  // 用户不存在
+	// WrongPassword      ErrNo = 5  // 密码错误
+	if member == (types.Member{}) {
+		// 空， 不存在该用户
+		response = types.LoginResponse{
+			Code: types.UserNotExisted,
+			Data: struct{ UserID string }{UserID: member.UserID},
+		}
+	} else if member.Password != request.Password {
+		response = types.LoginResponse{
+			Code: types.WrongPassword,
+			Data: struct{ UserID string }{UserID: member.UserID},
+		}
 	} else {
-		c.SetCookie("camp-session", res.Data.UserID, 3600, "/", "", false, true)
-		c.JSON(http.StatusOK, types.LoginResponse{Code: types.OK, Data: res.Data})
+		response = types.LoginResponse{
+			Code: types.OK,
+			Data: struct{ UserID string }{UserID: member.UserID},
+		}
+		c.SetCookie("camp-session", response.Data.UserID, 3600, "/", "", false, true)
 	}
+	c.JSON(http.StatusOK, response)
 }
 
-// 登出
 func Logout(c *gin.Context) {
-
+	value, err := c.Cookie("camp-session")
+	if err != nil {
+		log.Println(err)
+		// LoginRequired      ErrNo = 6  // 用户未登录
+		c.JSON(http.StatusOK, types.WhoAmIResponse{Code: types.LoginRequired})
+		return
+	}
+	c.SetCookie("camp-session", value, -1, "/", "", false, true)
+	c.JSON(http.StatusOK, types.LogoutResponse{Code: types.OK})
 }
 
-// 获取成员信息
 func Whoami(c *gin.Context) {
+	value, err := c.Cookie("camp-session")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, types.WhoAmIResponse{Code: types.LoginRequired})
+		return
+	}
+	var res types.TMember
+	database.Db.Table("members").Where(&value).Find(&res)
+	c.JSON(http.StatusOK, types.WhoAmIResponse{Code: types.OK, Data: res})
 }
