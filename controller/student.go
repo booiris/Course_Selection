@@ -25,15 +25,24 @@ func Student_book_course(c *gin.Context) {
 		database.Rdb.Incr(context, data.CourseID+"cnt")
 		c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.CourseNotAvailable})
 	} else {
-		err := database.Rdb.HSetNX(context, data.StudentID, data.CourseID, 0).Err()
-		if err != nil {
-			panic(err)
+		res := database.Rdb.HIncrBy(context, data.StudentID, data.CourseID, 1)
+		if res.Err() != nil {
+			panic(res.Err())
+		}
+		if res.Val() > 1 {
+			database.Rdb.HIncrBy(context, data.StudentID, data.CourseID, -1)
+			database.Rdb.Incr(context, data.CourseID+"cnt")
+			c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.StudentHasCourse})
+			return
 		}
 		create_data := types.SCourse{
 			UserID:   data.StudentID,
 			CourseID: data.CourseID,
 		}
-		database.Db.Table("s_courses").Select("user_id", "course_id").Create(&create_data)
+		create_err := database.Db.Table("s_courses").Select("user_id", "course_id").Create(&create_data)
+		if create_err.Error != nil {
+			panic(create_err.Error)
+		}
 		c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.OK})
 	}
 }

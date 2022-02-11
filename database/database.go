@@ -39,7 +39,7 @@ func InitDB() {
 	sqlDb, _ := Db.DB()
 	// 设置空闲连接数
 	// 数量 connections = ((core_count * 2) + effective_spindle_count)
-	sqlDb.SetConnMaxIdleTime(4)
+	sqlDb.SetConnMaxIdleTime(10)
 	// 最大连接数
 	sqlDb.SetMaxOpenConns(100)
 	// 连接复用连接时间
