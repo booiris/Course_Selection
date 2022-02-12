@@ -20,7 +20,7 @@ const (
 	host       string = "http://180.184.74.221:"
 	group      string = "/api/v1"
 	port       string = "2000"
-	course_cnt int    = 10
+	course_cnt int    = 300
 	// dir    string = "/course/create"
 )
 
@@ -30,7 +30,9 @@ var globalTransport *http.Transport
 var client http.Client
 
 func client_init() {
-	globalTransport = &http.Transport{}
+	globalTransport = &http.Transport{
+		DisableKeepAlives: true,
+	}
 	client = http.Client{
 		// Timeout:   30,
 		Transport: globalTransport,
@@ -150,7 +152,9 @@ func get_student_courses(student_id int) {
 	sort.Ints(temp)
 	for i := range temp {
 		if strconv.Itoa(temp[i]) != data.Data.CourseList[i].CourseID {
-			fmt.Println(id+":wrong\n", string(body)+"\n", temp)
+			fmt.Println(id + ":wrong")
+			fmt.Println(string(body))
+			fmt.Println(temp)
 			return
 		}
 	}
