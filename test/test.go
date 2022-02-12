@@ -26,9 +26,17 @@ const (
 
 var student [thread + 1][]string
 var wg sync.WaitGroup
-var client = http.Client{}
+var globalTransport *http.Transport
+
+func init() {
+	globalTransport = &http.Transport{}
+}
 
 func create_course() {
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 	dir := "/course/create"
 	for i := 0; i < course_cnt; i++ {
 		name := "C" + strconv.Itoa(i)
@@ -46,6 +54,10 @@ func create_course() {
 
 func book_course(student_id int) {
 	defer wg.Done()
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 
 	// 检验过程中检查数据一致性
 	check := make(chan bool)
@@ -81,6 +93,11 @@ func book_course(student_id int) {
 }
 
 func get_student_courses_chan(student_id int, check chan bool, over chan struct{}) {
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
+
 	id := strconv.Itoa(student_id)
 	dir := "/student/course"
 	params := "?StudentID=" + id
@@ -115,6 +132,10 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 }
 
 func get_student_courses(student_id int) {
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 	id := strconv.Itoa(student_id)
 	dir := "/student/course"
 	params := "?StudentID=" + id
@@ -147,6 +168,7 @@ func get_student_courses(student_id int) {
 }
 
 func main() {
+
 	create_course()
 	wg.Add(thread)
 	for i := 1; i <= thread; i++ {
