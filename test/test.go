@@ -27,19 +27,18 @@ const (
 var student [thread + 1][]string
 var wg sync.WaitGroup
 var globalTransport *http.Transport
-var client http.Client
 
 func client_init() {
 	globalTransport = &http.Transport{
 		DisableKeepAlives: true,
 	}
-	client = http.Client{
-		// Timeout:   30,
-		Transport: globalTransport,
-	}
 }
 
 func create_course() {
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 	dir := "/course/create"
 	for i := 0; i < course_cnt; i++ {
 		name := "C" + strconv.Itoa(i)
@@ -57,6 +56,10 @@ func create_course() {
 }
 
 func book_course(student_id int) {
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 	defer wg.Done()
 	// 检验过程中检查数据一致性
 	check := make(chan bool)
@@ -93,7 +96,10 @@ func book_course(student_id int) {
 }
 
 func get_student_courses_chan(student_id int, check chan bool, over chan struct{}) {
-
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 	id := strconv.Itoa(student_id)
 	dir := "/student/course"
 	params := "?StudentID=" + id
@@ -128,6 +134,10 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 }
 
 func get_student_courses(student_id int) {
+	client := http.Client{
+		// Timeout:   30,
+		Transport: globalTransport,
+	}
 	id := strconv.Itoa(student_id)
 	dir := "/student/course"
 	params := "?StudentID=" + id
