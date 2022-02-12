@@ -27,6 +27,7 @@ const (
 var student [thread + 1][]string
 var wg sync.WaitGroup
 var globalTransport *http.Transport
+var fail_cnt int = 0
 
 func client_init() {
 	globalTransport = &http.Transport{
@@ -75,6 +76,7 @@ func book_course(student_id int) {
 		params := url.Values{"StudentID": {id}, "CourseID": {course_id}}
 		resp, err := client.PostForm(host+port+group+dir, params)
 		if err != nil {
+			fail_cnt++
 			continue
 		}
 		defer resp.Body.Close()
@@ -110,6 +112,7 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 		}
 		resp, err := client.Get(host + port + group + dir + params)
 		if err != nil {
+			fail_cnt++
 			over <- struct{}{}
 			continue
 		}
@@ -181,6 +184,7 @@ func main() {
 	}
 	wg.Wait()
 	fmt.Println("检查最终数据一致性")
+	fmt.Println(fail_cnt)
 	time.Sleep(time.Duration(500) * time.Millisecond)
 	for i := 1; i <= thread; i++ {
 		get_student_courses(i)
