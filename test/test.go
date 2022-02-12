@@ -30,7 +30,7 @@ var globalTransport *http.Transport
 
 func client_init() {
 	globalTransport = &http.Transport{
-		DisableKeepAlives: true,
+		//DisableKeepAlives: true,
 	}
 }
 
@@ -75,7 +75,7 @@ func book_course(student_id int) {
 		params := url.Values{"StudentID": {id}, "CourseID": {course_id}}
 		resp, err := client.PostForm(host+port+group+dir, params)
 		if err != nil {
-			panic(err)
+			continue
 		}
 		defer resp.Body.Close()
 		res, _ := ioutil.ReadAll(resp.Body)
@@ -86,7 +86,7 @@ func book_course(student_id int) {
 			student[student_id] = append(student[student_id], course_id)
 		}
 
-		key := rand.Intn(thread)
+		key := rand.Intn(100)
 		if key == 0 {
 			check <- true
 			<-over
@@ -110,7 +110,8 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 		}
 		resp, err := client.Get(host + port + group + dir + params)
 		if err != nil {
-			panic(err)
+			over <- struct{}{}
+			continue
 		}
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
