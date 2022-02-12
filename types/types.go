@@ -7,6 +7,7 @@ import "gorm.io/gorm"
 // 2. 所有的 ID 均为 int64（以 string 方式表现）
 
 // 通用结构
+var CurrentSoldOutMap map[string]bool
 
 type ErrNo int
 

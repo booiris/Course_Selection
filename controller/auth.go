@@ -59,8 +59,8 @@ func Whoami(c *gin.Context) {
 	database.Db.Where("username=?", value).First(&user)
 
 	c.JSON(http.StatusOK, types.WhoAmIResponse{
-		types.OK,
-		types.TMember{
+		Code: types.OK,
+		Data: types.TMember{
 			UserID:   user.UserID,
 			Username: user.Username,
 			UserType: user.UserType,

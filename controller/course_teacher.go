@@ -15,12 +15,9 @@ func Course_create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
-	database.Db.Select("Name", "Cap").Create(&types.Course{
-		Name: createCourseRequest.Name,
-		Cap:  createCourseRequest.Cap})
+	database.Db.Table("courses").Create(&createCourseRequest)
 	var u types.Course
 	database.Db.Where("Name=?", createCourseRequest.Name).First(&u)
-
 	c.JSON(http.StatusOK, types.CreateCourseResponse{
 		types.OK,
 		struct{ CourseID string }{CourseID: u.CourseID},
@@ -37,7 +34,6 @@ func Course_get(c *gin.Context) {
 	}
 	var course types.TCourse
 	database.Db.Table("Courses").First(&course, getCourseRequest.CourseID)
-
 	c.JSON(http.StatusOK, types.GetCourseResponse{
 		Code: types.OK,
 		Data: course,
@@ -56,7 +52,7 @@ func Teacher_bind_course(c *gin.Context) {
 	//查询课程是否被绑定
 	database.Db.First(&course, bindCourseRequest.CourseID)
 	if course.TeacherID == "" {
-		course.TeacherID = bindCourseRequest.TeacherID
+		database.Db.Table("courses").Where("course_id=?", bindCourseRequest.CourseID).Update("teacher_id", bindCourseRequest.TeacherID)
 		c.JSON(http.StatusOK, types.BindCourseResponse{Code: types.OK})
 	} else {
 		c.JSON(http.StatusOK, types.BindCourseResponse{Code: types.CourseHasBound})
@@ -77,7 +73,7 @@ func Teacher_unbind_course(c *gin.Context) {
 	if course.TeacherID == "" {
 		c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.CourseNotBind})
 	} else {
-		course.TeacherID = ""
+		database.Db.Table("courses").Where("course_id=?", unbindCourseRequest.CourseID).Update("teacher_id", "")
 		c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.OK})
 	}
 }
