@@ -26,6 +26,7 @@ const (
 
 var student [thread + 1][]string
 var wg sync.WaitGroup
+var client = http.Client{}
 
 func create_course() {
 	dir := "/course/create"
@@ -33,7 +34,7 @@ func create_course() {
 		name := "C" + strconv.Itoa(i)
 		cap := strconv.Itoa(rand.Intn(300) + 1)
 		params := url.Values{"Name": {name}, "Cap": {cap}}
-		resp, err := http.PostForm(host+port+group+dir, params)
+		resp, err := client.PostForm(host+port+group+dir, params)
 		if err != nil {
 			panic(err)
 		}
@@ -58,7 +59,7 @@ func book_course(student_id int) {
 	for i := 0; i < q_cnt; i++ {
 		course_id := strconv.Itoa(rand.Intn(course_cnt) + 1)
 		params := url.Values{"StudentID": {id}, "CourseID": {course_id}}
-		resp, err := http.PostForm(host+port+group+dir, params)
+		resp, err := client.PostForm(host+port+group+dir, params)
 		if err != nil {
 			panic(err)
 		}
@@ -88,7 +89,7 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 		if !flag {
 			break
 		}
-		resp, err := http.Get(host + port + group + dir + params)
+		resp, err := client.Get(host + port + group + dir + params)
 		if err != nil {
 			panic(err)
 		}
@@ -117,7 +118,7 @@ func get_student_courses(student_id int) {
 	id := strconv.Itoa(student_id)
 	dir := "/student/course"
 	params := "?StudentID=" + id
-	resp, err := http.Get(host + port + group + dir + params)
+	resp, err := client.Get(host + port + group + dir + params)
 	if err != nil {
 		panic(err)
 	}
