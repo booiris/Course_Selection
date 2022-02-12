@@ -54,8 +54,19 @@ func Student_course(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+	// var res []types.TCourse
+	// database.Db.Table("courses").Where("course_id in (?)", database.Db.Table("s_courses").Select("course_id").Where("user_id=?", data.StudentID)).Find(&res)
+
+	ctx := context.Background()
+	result := database.Rdb.HGetAll(ctx, data.StudentID)
+	ids := make([]string, len(result.Val()))
+	index := 0
+	for k := range result.Val() {
+		ids[index] = k
+		index++
+	}
 	var res []types.TCourse
-	database.Db.Table("courses").Where("course_id in (?)", database.Db.Table("s_courses").Select("course_id").Where("user_id=?", data.StudentID)).Find(&res)
+	database.Db.Table("courses").Where("course_id in (?)", ids).Find(&res)
 
 	var temp struct {
 		CourseList []types.TCourse
