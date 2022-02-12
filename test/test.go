@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	thread     int    = 100 //访问线程个数
-	q_cnt      int    = 10  //每个线程发出请求次数
+	thread     int    = 3000 //访问线程个数
+	q_cnt      int    = 10   //每个线程发出请求次数
 	host       string = "http://180.184.74.221:"
 	group      string = "/api/v1"
 	port       string = "2000"
@@ -46,9 +46,10 @@ func create_course() {
 		if err != nil {
 			panic(err)
 		}
+		defer resp.Body.Close()
 		res, _ := ioutil.ReadAll(resp.Body)
 		fmt.Println(string(res))
-		resp.Body.Close()
+
 	}
 }
 
@@ -75,6 +76,7 @@ func book_course(student_id int) {
 		if err != nil {
 			panic(err)
 		}
+		defer resp.Body.Close()
 		res, _ := ioutil.ReadAll(resp.Body)
 		var data types.BookCourseResponse
 		json.Unmarshal(res, &data)
@@ -82,7 +84,7 @@ func book_course(student_id int) {
 		if data.Code == types.OK {
 			student[student_id] = append(student[student_id], course_id)
 		}
-		resp.Body.Close()
+
 		key := rand.Intn(thread)
 		if key == 0 {
 			check <- true
@@ -110,6 +112,7 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 		if err != nil {
 			panic(err)
 		}
+		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		var data types.GetStudentCourseResponse
 		json.Unmarshal(body, &data)
@@ -126,7 +129,6 @@ func get_student_courses_chan(student_id int, check chan bool, over chan struct{
 			}
 		}
 
-		resp.Body.Close()
 		over <- struct{}{}
 	}
 }
@@ -164,7 +166,7 @@ func get_student_courses(student_id int) {
 			return
 		}
 	}
-	fmt.Println(string(body)+"\n", temp)
+	//fmt.Println(string(body)+"\n", temp)
 }
 
 func main() {
