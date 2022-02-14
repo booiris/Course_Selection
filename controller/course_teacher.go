@@ -29,17 +29,24 @@ func Course_create(c *gin.Context) {
 // 获取课程对应老师
 func Course_get(c *gin.Context) {
 	var getCourseRequest types.GetCourseRequest
-	//表单数据绑定
+	//表单数据绑定，如果填的参数不规范，或者为空应该返回参数不合法
 	if err := c.ShouldBind(&getCourseRequest); err != nil {
 		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
 	var course types.TCourse
 	database.Db.Table("Courses").First(&course, getCourseRequest.CourseID)
-	c.JSON(http.StatusOK, types.GetCourseResponse{
-		Code: types.OK,
-		Data: course,
-	})
+	if course == (types.TCourse{}) { //如果数据库中没有查到课程说明课程不存在
+		c.JSON(http.StatusOK, types.GetCourseResponse{
+			Code: types.CourseNotExisted,
+			Data: course,
+		})
+	} else {
+		c.JSON(http.StatusOK, types.GetCourseResponse{
+			Code: types.OK,
+			Data: course,
+		})
+	}
 }
 
 // 老师绑定课程
@@ -50,13 +57,21 @@ func Teacher_bind_course(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
-	var course types.Course
 	//查询课程是否被绑定
+	var course types.Course
 	database.Db.First(&course, bindCourseRequest.CourseID)
-	if course.TeacherID == "" {
+	if course == (types.Course{}) { //如果数据库中没有查到课程说明课程不存在
+		c.JSON(http.StatusOK, types.BindCourseResponse{
+			Code: types.CourseNotExisted,
+		})
+		return
+	}
+	//不用判断老师id，因为types里给出了老师id不用做落户校验
+	//如果查询到了课程
+	if course.TeacherID == "" { //如果teacherid字段为空，说明可以绑定
 		database.Db.Table("courses").Where("course_id=?", bindCourseRequest.CourseID).Update("teacher_id", bindCourseRequest.TeacherID)
 		c.JSON(http.StatusOK, types.BindCourseResponse{Code: types.OK})
-	} else {
+	} else { //否则返回课程已绑定过
 		c.JSON(http.StatusOK, types.BindCourseResponse{Code: types.CourseHasBound})
 	}
 }
@@ -69,12 +84,20 @@ func Teacher_unbind_course(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
-	var course types.Course
 	//查询课程是否被绑定
+	var course types.Course
 	database.Db.First(&course, unbindCourseRequest.CourseID)
-	if course.TeacherID == "" {
+	if course == (types.Course{}) { //如果数据库中没有查到课程说明课程不存在
+		c.JSON(http.StatusOK, types.UnbindCourseResponse{
+			Code: types.CourseNotExisted,
+		})
+		return
+	}
+	//同理 老师id应该不用判断，因为没有老师不存在的状态码
+	//如果课程存在
+	if course.TeacherID == "" { //teacher字段为空，说明该课程没有绑定
 		c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.CourseNotBind})
-	} else {
+	} else { // 否则解绑
 		database.Db.Table("courses").Where("course_id=?", unbindCourseRequest.CourseID).Update("teacher_id", "")
 		c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.OK})
 	}
@@ -88,11 +111,12 @@ func Teacher_get_course(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
+	// 同理 这里不用判断老师id是否存在
 	var courses []*types.TCourse
 	database.Db.Table("Courses").Where("TeacherID", getTeacherCourseRequest.TeacherID).Find(&courses)
 	c.JSON(http.StatusOK, types.GetTeacherCourseResponse{
-		Code: types.OK,
-		Data: struct{ CourseList []*types.TCourse }{CourseList: courses},
+		types.OK,
+		struct{ CourseList []*types.TCourse }{CourseList: courses},
 	})
 }
 
