@@ -191,20 +191,13 @@ func Member_delete(c *gin.Context) {
 		return
 	}
 
-	var check types.Member
-	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", data.UserID).Find(&check)
-	if check == (types.Member{}) {
-		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserNotExisted})
-		return
-	} else if check.Deleted.Valid {
-		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserHasDeleted})
-		return
-	}
-
 	var user types.Member
-	database.Db.Model(&types.Member{}).Where(&data).Find(&user)
+	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", data.UserID).Find(&user)
 	if user == (types.Member{}) {
 		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserNotExisted})
+		return
+	} else if user.Deleted.Valid {
+		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserHasDeleted})
 		return
 	}
 	if user.UserType == types.Teacher {
