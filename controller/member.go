@@ -111,7 +111,7 @@ func Member_create(c *gin.Context) {
 		var res struct{ UserId string }
 		database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
 		if res == (struct{ UserId string }{}) {
-			database.Db.Model(types.Member{}).Create(&data)
+			database.Db.Table("members").Create(&data)
 			database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.OK, Data: struct{ UserID string }{res.UserId}})
 		} else {
