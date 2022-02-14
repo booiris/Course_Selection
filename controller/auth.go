@@ -19,8 +19,8 @@ func Login(c *gin.Context) {
 		return
 	}
 	var member types.Member
-	database.Db.Where("username = ?", loginRequest.Username).Find(&member)
-	if member.Password != loginRequest.Password {
+	database.Db.Model(&types.Member{}).Where(&loginRequest).Find(&member)
+	if member == (types.Member{}) {
 		c.JSON(200, types.LoginResponse{Code: types.WrongPassword})
 		return
 	}
