@@ -68,18 +68,20 @@ func check_param(data types.CreateMemberRequest) bool {
 	}
 
 	// 密码
-	letter, digit := false, false
+	upper, lower, digit := false, false, false
 	for _, v := range data.Password {
 		if !(unicode.IsLetter(v) || unicode.IsDigit(v)) {
 			return false
 		}
-		if unicode.IsLetter(v) {
-			letter = true
+		if unicode.IsUpper(v) {
+			upper = true
 		} else if unicode.IsDigit(v) {
 			digit = true
+		} else if unicode.IsLower(v) {
+			lower = true
 		}
 	}
-	if !(letter && digit) {
+	if !(digit && lower && upper) {
 		return false
 	}
 	len = strings.Count(data.Password, "")
