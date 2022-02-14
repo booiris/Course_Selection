@@ -115,8 +115,8 @@ func Teacher_get_course(c *gin.Context) {
 	var courses []*types.TCourse
 	database.Db.Table("Courses").Where("TeacherID", getTeacherCourseRequest.TeacherID).Find(&courses)
 	c.JSON(http.StatusOK, types.GetTeacherCourseResponse{
-		types.OK,
-		struct{ CourseList []*types.TCourse }{CourseList: courses},
+		Code: types.OK,
+		Data: struct{ CourseList []*types.TCourse }{CourseList: courses},
 	})
 }
 
