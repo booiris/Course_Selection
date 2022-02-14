@@ -203,6 +203,8 @@ func Member_delete(c *gin.Context) {
 	if user.UserType == types.Teacher {
 		database.Db.Table("courses").Where("teacher_id=?", user.UserID).Update("teacher_id", nil)
 	} else if user.UserType == types.Student {
+		ctx := context.Background()
+		database.Rdb.Del(ctx, user.UserID)
 		database.Db.Where("user_id=?", user.UserID).Delete(types.SCourse{})
 	}
 	database.Db.Where("user_id=?", data.UserID).Delete(&types.Member{})

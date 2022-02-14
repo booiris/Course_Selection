@@ -4,6 +4,7 @@ import (
 	"context"
 	"course_selection/types"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -98,4 +99,17 @@ func InitRedis() {
 	}
 
 	fmt.Println("open redis success")
+}
+
+func FindUserType(user_id string) types.UserType {
+	ctx := context.Background()
+	redis_res := Rdb.Get(ctx, "usertype"+user_id)
+	if redis_res.Err() == redis.Nil {
+		var res struct{ UserType types.UserType }
+		Db.Model(types.Member{}).Where("user_id=?", user_id).Find(&res)
+		return res.UserType
+	} else {
+		res, _ := strconv.Atoi(redis_res.Val())
+		return types.UserType(res)
+	}
 }
