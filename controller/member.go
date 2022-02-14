@@ -172,10 +172,10 @@ func Member_update(c *gin.Context) {
 	var check types.Member
 	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", data.UserID).Find(&check)
 	if check == (types.Member{}) {
-		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserNotExisted})
+		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.UserNotExisted})
 		return
 	} else if check.Deleted.Valid {
-		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserHasDeleted})
+		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.UserHasDeleted})
 		return
 	}
 
@@ -194,10 +194,10 @@ func Member_delete(c *gin.Context) {
 	var check types.Member
 	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", data.UserID).Find(&check)
 	if check == (types.Member{}) {
-		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserNotExisted})
+		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserNotExisted})
 		return
 	} else if check.Deleted.Valid {
-		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserHasDeleted})
+		c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.UserHasDeleted})
 		return
 	}
 
