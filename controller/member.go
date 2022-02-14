@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"course_selection/database"
 	"course_selection/types"
 	"log"
@@ -9,22 +10,47 @@ import (
 	"unicode"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 )
 
 func check_permission(c *gin.Context) bool {
-	value, err := c.Cookie("camp-session")
+	sessionKey, err := c.Cookie("camp-session")
 	if err != nil {
-		log.Println(err)
+		c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.LoginRequired})
 		return false
 	}
-	var res struct{ UserType types.UserType }
-	database.Db.Table("members").Where(&value).Find(&res)
-	return res.UserType == types.Admin
+
+	ctx := context.Background()
+	userid := database.Rdb.Get(ctx, sessionKey)
+	if userid.Err() == redis.Nil {
+		c.JSON(200, types.CreateMemberResponse{Code: types.LoginRequired})
+		return false
+	}
+
+	var res types.Member
+	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", userid.Val()).Find(&res)
+	if res == (types.Member{}) {
+		c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.UserNotExisted})
+		return false
+	} else if res.Deleted.Valid {
+		c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.UserHasDeleted})
+		return false
+	}
+	if res.UserType != types.Admin {
+		c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.PermDenied})
+		return false
+	}
+	return true
 }
 
 func check_param(data types.CreateMemberRequest) bool {
 
 	// 用户昵称
+	for _, v := range data.Nickname {
+		if !(unicode.IsLetter(v)) {
+			return false
+		}
+	}
 	len := strings.Count(data.Nickname, "")
 	if len < 4 || len > 20 {
 		return false
@@ -32,7 +58,7 @@ func check_param(data types.CreateMemberRequest) bool {
 
 	// 用户名
 	for _, v := range data.Username {
-		if !(unicode.IsLetter(v) || unicode.IsDigit(v)) {
+		if !(unicode.IsLetter(v)) {
 			return false
 		}
 	}
@@ -72,7 +98,6 @@ func check_param(data types.CreateMemberRequest) bool {
 // 创建成员
 func Member_create(c *gin.Context) {
 	if !check_permission(c) {
-		c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.PermDenied})
 		return
 	}
 	var data types.CreateMemberRequest
@@ -142,12 +167,18 @@ func Member_update(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	res := database.Db.Model(types.Member{}).Where("user_id=?", data.UserID).Update("Nickname", data.Nickname)
-	if res.RowsAffected == 0 {
-		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.UserNotExisted})
-	} else {
-		c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.OK})
+	var check types.Member
+	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", data.UserID).Find(&check)
+	if check == (types.Member{}) {
+		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserNotExisted})
+		return
+	} else if check.Deleted.Valid {
+		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserHasDeleted})
+		return
 	}
+
+	database.Db.Model(types.Member{}).Where("user_id=?", data.UserID).Update("Nickname", data.Nickname)
+	c.JSON(http.StatusOK, types.UpdateMemberResponse{Code: types.OK})
 }
 
 // 删除成员
@@ -157,6 +188,17 @@ func Member_delete(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+
+	var check types.Member
+	database.Db.Model(types.Member{}).Unscoped().Where("user_id=?", data.UserID).Find(&check)
+	if check == (types.Member{}) {
+		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserNotExisted})
+		return
+	} else if check.Deleted.Valid {
+		c.JSON(http.StatusOK, types.GetMemberResponse{Code: types.UserHasDeleted})
+		return
+	}
+
 	var user types.Member
 	database.Db.Model(&types.Member{}).Where(&data).Find(&user)
 	if user == (types.Member{}) {
@@ -169,6 +211,5 @@ func Member_delete(c *gin.Context) {
 		database.Db.Where("user_id=?", user.UserID).Delete(types.SCourse{})
 	}
 	database.Db.Where("user_id=?", data.UserID).Delete(&types.Member{})
-	c.SetCookie("camp-session", data.UserID, -1, "/", "", false, true)
 	c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.OK})
 }
