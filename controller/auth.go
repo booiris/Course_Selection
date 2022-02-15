@@ -19,8 +19,11 @@ func Login(c *gin.Context) {
 		return
 	}
 	var member types.Member
-	database.Db.Model(&types.Member{}).Where(&loginRequest).Find(&member)
+	database.Db.Model(types.Member{}).Where("username=?", loginRequest.Username).Find(&member)
 	if member == (types.Member{}) {
+		c.JSON(200, types.LoginResponse{Code: types.UserNotExisted})
+		return
+	} else if member.Password != loginRequest.Password {
 		c.JSON(200, types.LoginResponse{Code: types.WrongPassword})
 		return
 	}
