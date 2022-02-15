@@ -15,7 +15,7 @@ func Course_create(c *gin.Context) {
 	var createCourseRequest types.CreateCourseRequest
 	//表单数据绑定
 	if err := c.ShouldBind(&createCourseRequest); err != nil {
-		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
+		c.JSON(http.StatusOK, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
 	database.Db.Table("courses").Create(&createCourseRequest)
@@ -34,11 +34,11 @@ func Course_get(c *gin.Context) {
 	var getCourseRequest types.GetCourseRequest
 	//表单数据绑定，如果填的参数不规范，或者为空应该返回参数不合法
 	if err := c.ShouldBind(&getCourseRequest); err != nil {
-		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
+		c.JSON(http.StatusOK, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
 	var course types.TCourse
-	database.Db.Table("Courses").First(&course, getCourseRequest.CourseID)
+	database.Db.Table("courses").First(&course, getCourseRequest.CourseID)
 	if course == (types.TCourse{}) { //如果数据库中没有查到课程说明课程不存在
 		c.JSON(http.StatusOK, types.GetCourseResponse{
 			Code: types.CourseNotExisted,
@@ -57,7 +57,7 @@ func Teacher_bind_course(c *gin.Context) {
 	var bindCourseRequest types.BindCourseRequest
 	//表单数据绑定
 	if err := c.ShouldBind(&bindCourseRequest); err != nil {
-		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
+		c.JSON(http.StatusOK, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
 	//查询课程是否被绑定
@@ -84,7 +84,7 @@ func Teacher_unbind_course(c *gin.Context) {
 	var unbindCourseRequest types.UnbindCourseRequest
 	//表单数据绑定
 	if err := c.ShouldBind(&unbindCourseRequest); err != nil {
-		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
+		c.JSON(http.StatusOK, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
 	//查询课程是否被绑定
@@ -101,7 +101,7 @@ func Teacher_unbind_course(c *gin.Context) {
 	if course.TeacherID == "" { //teacher字段为空，说明该课程没有绑定
 		c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.CourseNotBind})
 	} else { // 否则解绑
-		database.Db.Table("courses").Where("course_id=?", unbindCourseRequest.CourseID).Update("teacher_id", "")
+		database.Db.Table("courses").Where("course_id=?", unbindCourseRequest.CourseID).Update("teacher_id", nil)
 		c.JSON(http.StatusOK, types.UnbindCourseResponse{Code: types.OK})
 	}
 }
@@ -111,7 +111,7 @@ func Teacher_get_course(c *gin.Context) {
 	var getTeacherCourseRequest types.GetTeacherCourseRequest
 	//表单数据绑定
 	if err := c.ShouldBind(&getTeacherCourseRequest); err != nil {
-		c.JSON(http.StatusInternalServerError, types.ResponseMeta{Code: types.ParamInvalid})
+		c.JSON(http.StatusOK, types.ResponseMeta{Code: types.ParamInvalid})
 		return
 	}
 	// 同理 这里不用判断老师id是否存在
