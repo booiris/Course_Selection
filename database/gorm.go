@@ -113,3 +113,22 @@ func FindUserType(user_id string) types.UserType {
 		return types.UserType(res)
 	}
 }
+
+func SyncMysql() {
+	ctx := context.Background()
+	cnt := 0
+	for {
+		query := Rdb.BLPop(ctx, 0, "Sync_mysql")
+		temp := strings.Split(query.Val()[1], ",")
+		create_data := types.SCourse{
+			UserID:   temp[0],
+			CourseID: temp[1],
+		}
+		Db.Table("s_courses").Select("user_id", "course_id").Create(&create_data)
+		cnt++
+		if cnt > 100 {
+			cnt = 0
+			time.Sleep(200 * time.Millisecond)
+		}
+	}
+}

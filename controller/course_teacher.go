@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"course_selection/database"
 	"course_selection/types"
 	"log"
@@ -20,6 +21,8 @@ func Course_create(c *gin.Context) {
 	database.Db.Table("courses").Create(&createCourseRequest)
 	var u types.Course
 	database.Db.Where("Name=?", createCourseRequest.Name).First(&u)
+	ctx := context.Background()
+	database.Rdb.Set(ctx, u.CourseID+"cnt", u.Cap, 0)
 	c.JSON(http.StatusOK, types.CreateCourseResponse{
 		Code: types.OK,
 		Data: struct{ CourseID string }{CourseID: u.CourseID},

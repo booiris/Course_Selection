@@ -42,6 +42,7 @@ func Student_book_course(c *gin.Context) {
 		// if create_err.Error != nil {
 		// 	panic(create_err.Error)
 		// }
+		database.Rdb.RPush(context, "Sync_mysql", data.StudentID+","+data.CourseID)
 		c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.OK})
 	}
 }

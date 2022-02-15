@@ -18,7 +18,7 @@ import (
 const (
 	thread      int    = 2000 //访问线程个数
 	student_num int    = 1000
-	q_cnt       int    = 30 //每个线程发出请求次数
+	q_cnt       int    = 5 //每个线程发出请求次数
 	host        string = "http://180.184.74.221:"
 	group       string = "/api/v1"
 	port        string = "80"
@@ -67,7 +67,7 @@ func create_course() {
 	for i := 0; i < course_cnt; i++ {
 		// 构造 课程名和容量
 		name := "C" + strconv.Itoa(i)
-		cap := strconv.Itoa(rand.Intn(300) + 1)
+		cap := strconv.Itoa(rand.Intn(260) + 40)
 		params := url.Values{"Name": {name}, "Cap": {cap}}
 
 		// 发送 post 请求
@@ -252,7 +252,7 @@ func get_student_courses(student_id int) {
 
 func main() {
 	client_init()
-	create_course()
+	//create_course()
 	wg.Add(thread)
 	for i := 1; i <= thread; i++ {
 		go book_course(i)
