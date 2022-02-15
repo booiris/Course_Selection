@@ -97,30 +97,6 @@ func check_param(data types.CreateMemberRequest) bool {
 	return true
 }
 
-// 创建成员
-// func Member_create(c *gin.Context) {
-// 	if !check_permission(c) {
-// 		return
-// 	}
-// 	var data types.CreateMemberRequest
-// 	if err := c.ShouldBind(&data); err != nil {
-// 		log.Println(err)
-// 		return
-// 	}
-// 	if check_param(data) {
-// 		var res struct{ UserId string }
-// 		database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
-// 		if res == (struct{ UserId string }{}) {
-// 			database.Db.Table("members").Create(&data)
-// 			database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
-// 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.OK, Data: struct{ UserID string }{res.UserId}})
-// 		} else {
-// 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.UserHasExisted})
-// 		}
-// 	} else {
-// 		c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.ParamInvalid})
-// 	}
-// }
 func Member_create(c *gin.Context) {
 	if !check_permission(c) {
 		return
