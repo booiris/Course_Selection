@@ -252,7 +252,7 @@ func get_student_courses(student_id int) {
 
 func main() {
 	client_init()
-	//create_course()
+	create_course()
 	wg.Add(thread)
 	for i := 1; i <= thread; i++ {
 		go book_course(i)

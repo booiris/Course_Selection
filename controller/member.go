@@ -208,6 +208,8 @@ func Member_delete(c *gin.Context) {
 		database.Rdb.Del(ctx, user.UserID)
 		database.Db.Where("user_id=?", user.UserID).Delete(types.SCourse{})
 	}
+	ctx := context.Background()
+	database.Rdb.Set(ctx, "usertype"+data.UserID, -1, 0)
 	database.Db.Where("user_id=?", data.UserID).Delete(&types.Member{})
 	c.JSON(http.StatusOK, types.DeleteMemberResponse{Code: types.OK})
 }

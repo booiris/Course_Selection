@@ -19,6 +19,26 @@ func Student_book_course(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+
+	// TODO :测试用
+	// user_type := database.FindUserType(data.StudentID)
+	// if user_type == 0 {
+	// 	c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.UserNotExisted})
+	// 	return
+	// } else if user_type < 0 {
+	// 	c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.UserHasDeleted})
+	// 	return
+	// } else if user_type != types.Student {
+	// 	c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.StudentNotExisted})
+	// 	return
+	// }
+
+	check_course := database.CheckCourse(data.CourseID)
+	if !check_course {
+		c.JSON(http.StatusOK, types.BookCourseResponse{Code: types.CourseNotExisted})
+		return
+	}
+
 	nownum := database.Rdb.Decr(context, data.CourseID+"cnt")
 	if nownum.Val() < 0 {
 		database.Rdb.Incr(context, data.CourseID+"cnt")
@@ -46,6 +66,19 @@ func Student_course(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+
+	// TODO :测试用
+	// user_type := database.FindUserType(data.StudentID)
+	// if user_type == 0 {
+	// 	c.JSON(http.StatusOK, types.GetStudentCourseResponse{Code: types.UserNotExisted})
+	// 	return
+	// } else if user_type < 0 {
+	// 	c.JSON(http.StatusOK, types.GetStudentCourseResponse{Code: types.UserHasDeleted})
+	// 	return
+	// } else if user_type != types.Student {
+	// 	c.JSON(http.StatusOK, types.GetStudentCourseResponse{Code: types.StudentNotExisted})
+	// 	return
+	// }
 
 	ctx := context.Background()
 	result := database.Rdb.HGetAll(ctx, data.StudentID)

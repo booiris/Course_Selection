@@ -101,14 +101,41 @@ func InitRedis() {
 	fmt.Println("open redis success")
 }
 
+func CheckCourse(course_id string) bool {
+	ctx := context.Background()
+	is_exist := Rdb.Get(ctx, "course"+course_id)
+	if is_exist.Err() == redis.Nil {
+		var res types.Course
+		Db.Model(types.Course{}).Where("course_id=?", course_id).Find(&res)
+		if res == (types.Course{}) {
+			return false
+		} else {
+			Rdb.Set(ctx, "course"+course_id, 0, 0)
+			return true
+		}
+	} else {
+		return true
+	}
+}
+
 func FindUserType(user_id string) types.UserType {
 	ctx := context.Background()
 	redis_res := Rdb.Get(ctx, "usertype"+user_id)
 	if redis_res.Err() == redis.Nil {
-		var res struct{ UserType types.UserType }
-		Db.Model(types.Member{}).Where("user_id=?", user_id).Find(&res)
-		return res.UserType
+		var res types.Member
+		Db.Model(types.Member{}).Unscoped().Where("user_id=?", user_id).Find(&res)
+		var ans int
+		if res == (types.Member{}) {
+			ans = 0
+		} else if res.Deleted.Valid {
+			ans = -1
+		} else {
+			ans = int(res.UserType)
+		}
+		Rdb.Set(ctx, "usertype"+user_id, ans, 0)
+		return types.UserType(ans)
 	} else {
+		fmt.Println("1233222")
 		res, _ := strconv.Atoi(redis_res.Val())
 		return types.UserType(res)
 	}
