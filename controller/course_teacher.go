@@ -4,7 +4,6 @@ import (
 	"context"
 	"course_selection/database"
 	"course_selection/types"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -23,6 +22,7 @@ func Course_create(c *gin.Context) {
 	var u types.Course
 	database.Db.Where("Name=?", createCourseRequest.Name).First(&u)
 	ctx := context.Background()
+	database.Rdb.Set(ctx, "course"+u.CourseID, 1, 0)
 	database.Rdb.Set(ctx, u.CourseID+"cnt", u.Cap, 0)
 	c.JSON(http.StatusOK, types.CreateCourseResponse{
 		Code: types.OK,
@@ -132,7 +132,7 @@ func Course_schedule(c *gin.Context) {
 		return
 	}
 	//TODO 删除
-	fmt.Println(data)
+	// fmt.Println(data)
 	res := match_course(&data.TeacherCourseRelationShip)
 	c.JSON(http.StatusOK, types.ScheduleCourseResponse{Code: types.OK, Data: res})
 }

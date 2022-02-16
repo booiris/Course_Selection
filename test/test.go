@@ -11,7 +11,6 @@ import (
 	"sort"
 	"strconv"
 	"sync"
-	"time"
 )
 
 // 参数
@@ -253,16 +252,16 @@ func get_student_courses(student_id int) {
 func main() {
 	client_init()
 	create_course()
-	wg.Add(thread)
-	for i := 1; i <= thread; i++ {
-		go book_course(i)
-	}
-	wg.Wait()
-	fmt.Println("检查最终数据一致性")
-	fmt.Println("fail:", fail_cnt)
-	fmt.Println("total:", requset_cnt)
-	time.Sleep(time.Duration(500) * time.Millisecond)
-	for i := 1; i <= thread; i++ {
-		get_student_courses(i)
-	}
+	// wg.Add(thread)
+	// for i := 1; i <= thread; i++ {
+	// 	go book_course(i)
+	// }
+	// wg.Wait()
+	// fmt.Println("检查最终数据一致性")
+	// fmt.Println("fail:", fail_cnt)
+	// fmt.Println("total:", requset_cnt)
+	// time.Sleep(time.Duration(500) * time.Millisecond)
+	// for i := 1; i <= thread; i++ {
+	// 	get_student_courses(i)
+	// }
 }

@@ -108,9 +108,10 @@ func CheckCourse(course_id string) bool {
 		var res types.Course
 		Db.Model(types.Course{}).Where("course_id=?", course_id).Find(&res)
 		if res == (types.Course{}) {
+			Rdb.Set(ctx, "course"+course_id, 0, 0)
 			return false
 		} else {
-			Rdb.Set(ctx, "course"+course_id, 0, 0)
+			Rdb.Set(ctx, "course"+course_id, 1, 0)
 			return true
 		}
 	} else {
@@ -135,7 +136,6 @@ func FindUserType(user_id string) types.UserType {
 		Rdb.Set(ctx, "usertype"+user_id, ans, 0)
 		return types.UserType(ans)
 	} else {
-		fmt.Println("1233222")
 		res, _ := strconv.Atoi(redis_res.Val())
 		return types.UserType(res)
 	}
