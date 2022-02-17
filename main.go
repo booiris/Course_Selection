@@ -25,10 +25,10 @@ func main() {
 
 	database.InitRedis()
 
-	//go database.SyncMysql()
-	//go database.SyncMysql()
+	go database.SyncMysql()
+	go database.SyncMysql()
 	// 初始化网络服务
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 	g := gin.Default()
 	router.RegisterRouter(g)
 	g.Run(":80")
