@@ -112,6 +112,8 @@ func Member_create(c *gin.Context) {
 		if res == (types.Member{}) {
 			database.Db.Table("members").Create(&data)
 			database.Db.Model(types.Member{}).Where("username=?", data.Username).Find(&res)
+			ctx := context.Background()
+			database.Rdb.Set(ctx, "usertype"+res.UserID, int(res.UserType), 0)
 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.OK, Data: struct{ UserID string }{res.UserID}})
 		} else if res.Deleted.Valid {
 			c.JSON(http.StatusOK, types.CreateMemberResponse{Code: types.UserHasDeleted})

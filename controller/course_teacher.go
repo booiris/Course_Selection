@@ -131,8 +131,6 @@ func Course_schedule(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	//TODO 删除
-	// fmt.Println(data)
 	res := match_course(&data.TeacherCourseRelationShip)
 	c.JSON(http.StatusOK, types.ScheduleCourseResponse{Code: types.OK, Data: res})
 }
