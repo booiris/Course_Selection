@@ -10,13 +10,16 @@
 │   ├── member.go
 │   └── student.go
 ├── database
-│   └── gorm.go
+│   └── database.go
 ├── go.mod
 ├── go.sum
 ├── main.go
 ├── README.md
 ├── router
 │   └── router.go
+├── test
+│   ├── analysis.py
+│   └── test.go
 └── types
     └── types.go
 ```
@@ -27,7 +30,7 @@
 
 ### database 模块
 
-初始化数据库连接，其中包含了一个数据库连接变量 Db ，可以通过这个变量对数据库进行操作。
+初始化数据库连接，其中包含了一个数据库连接变量 Db 和一个redis连接变量 Rdb，可以通过这些变量对数据库和redis进行操作。
 
 ### main 模块
 
@@ -37,6 +40,23 @@
 
 绑定地址，为不同的地址绑定不同的响应函数。
 
+### test 模块
+
+自己编写的压测函数，用于检验数据一致性。
+
 ### types 模块
 
 其中定义了所使用的要的数据结构和常量。
+
+## 使用方法
+
+安装依赖
+
+```
+go install
+```
+
+程序运行
+```
+go run .
+```
