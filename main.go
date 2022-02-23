@@ -25,8 +25,8 @@ func main() {
 
 	database.InitRedis()
 
-	go database.SyncMysql()
-	go database.SyncMysql()
+	go database.AsyncMysql()
+	go database.AsyncMysql()
 	// 初始化网络服务
 	gin.SetMode(gin.ReleaseMode)
 	g := gin.Default()

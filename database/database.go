@@ -141,11 +141,11 @@ func FindUserType(user_id string) types.UserType {
 	}
 }
 
-func SyncMysql() {
+func AsyncMysql() {
 	ctx := context.Background()
 	cnt := 0
 	for {
-		query := Rdb.BLPop(ctx, 0, "Sync_mysql")
+		query := Rdb.BLPop(ctx, 0, "Async_mysql")
 		temp := strings.Split(query.Val()[1], ",")
 		create_data := types.SCourse{
 			UserID:   temp[0],
